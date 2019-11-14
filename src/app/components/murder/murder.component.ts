@@ -35,7 +35,7 @@ export class MurderComponent implements OnInit {
       .forceSimulation()
       .force(
         'link',
-        d3.forceLink().id((d: INode) => {
+        d3.forceLink().id((d: any) => {
           return d.id;
         })
       )
