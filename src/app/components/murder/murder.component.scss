@@ -1,0 +1,14 @@
+:host {
+    .appMurderFilter {
+        display: flex;
+        div {
+            cursor: pointer;
+            margin: 5px;
+            padding: 5px;
+            background: lightgray;
+            &:hover {
+                background: darkgray;
+            }
+        }
+    }
+}

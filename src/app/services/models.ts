@@ -1,17 +1,36 @@
 export interface IMurderCaseGuardian {
     age: number;
-    armed: String;
-    city: String;
-    classification: String;
-    date: String;
-    gender: String;
+    armed: string;
+    city: string;
+    classification: string;
+    date: string;
+    gender: string;
     hasimage: boolean;
     large: boolean;
     lat: number;
     long: number;
-    name: String;
-    race: String;
-    slug: String;
-    state: String;
+    name: string;
+    race: string;
+    slug: string;
+    state: string;
     uid: number;
+    id: string;
+}
+
+export interface IMurderGraph {
+    x: number;
+    y: number;
+}
+
+export interface ILink {
+    source: string;
+    target: string;
+    value: number;
+  }
+
+export interface INode {
+    id: string;
+    name: string;   
+    color: string;
+    type: string;
 }
