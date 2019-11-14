@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, ɵConsole } from '@angular/core';
 import { IMurderCaseGuardian, INode, ILink } from './models';
 import * as data from 'src/assets/murder.guardian.json';
 
@@ -59,7 +59,7 @@ export class GuardiansStructService {
     
     this.allData.forEach(aMurder => {
       idx += 1;
-      if (idx > 100) return; 
+     // if (idx > 100) return; 
       aMurder.id = String(aMurder.uid);
 
       genderSet.add(aMurder.gender);
@@ -78,7 +78,7 @@ export class GuardiansStructService {
         {
           source: aMurder.id,
           target: 'race.' + aMurder.race,
-          value: 5,
+          value: 1,
         }
       );
 
@@ -86,7 +86,7 @@ export class GuardiansStructService {
         {
           source: aMurder.id,
           target: 'armed.' + aMurder.armed,
-          value: 5,
+          value: 1,
         }
       );
 
@@ -94,7 +94,7 @@ export class GuardiansStructService {
         {
           source: aMurder.id,
           target: 'gender.' + aMurder.gender,
-          value: 5,
+          value: 1,
         }
       );
     });
@@ -114,10 +114,11 @@ export class GuardiansStructService {
       this.mainCatLinks.push({
         source: armedKey,
         target: 'armed',
-        value: 5,
+        value: 1,
       });
     });
 
+    console.log('race', this.raceValues)
     this.raceValues.forEach((val) => {
       const raceKey =  'race.' + val;
       this.raceNodes.push({
@@ -128,7 +129,7 @@ export class GuardiansStructService {
       this.mainCatLinks.push({
           source: raceKey,
           target: 'race',
-          value: 5,
+          value: 1,
         });
     });
 
@@ -185,8 +186,14 @@ export class GuardiansStructService {
       color = 'yellow';
     } else if (race === 'W') {
       color = 'pink';
-    } else {
-      color = 'blue';
+    } else if (race === 'H') {
+      color = 'brown';
+    } else if (race === 'N') {
+      color = 'red';
+    } else if (race === 'O') {
+      color = 'gray';
+    }  else {
+      color = 'magenta';
     }
 
     return color;

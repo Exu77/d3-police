@@ -37,7 +37,7 @@ export class MurderStructComponent implements OnInit {
       .force('link', d3.forceLink().id((d: any) => {
         return d.id;
       }))
-      .force('charge', d3.forceManyBody().strength(-80))
+      .force('charge', d3.forceManyBody().strength(-10))
       .force('center', d3.forceCenter(this.width / 2, this.height / 2))
  //     .force('x', forceX)
  //     .force('y',  forceY)
@@ -99,7 +99,7 @@ export class MurderStructComponent implements OnInit {
       .data(murderData, (d) => d.id)
       .enter()
       .append('circle')
-      .attr('r', 6)
+      .attr('r', 3)
       .attr('fill', function(d) {
         return d.color;
       })
