@@ -22,13 +22,12 @@ export class MurderComponent implements OnInit {
   // https://data.census.gov/cedsci/table?q=race&hidePreview=false&table=C02003&tid=ACSDT1Y2018.C02003&lastDisplayedRow=18
   // https://github.com/washingtonpost/data-police-shootings
 
-  @Inject
   constructor(  private guardiansService: GuardiansServiceService) {
     const forceX = d3.forceX(this.width / 4).strength(0.05);
     const forceY = d3.forceY(this.height / 4).strength(0.05);
 
     this.simulation = d3.forceSimulation()
-    .force('link', d3.forceLink().id((d: INode) => {
+    .force('link', d3.forceLink().id((d: any) => {
       return d.id;
     }))
     .force("charge", d3.forceManyBody())
@@ -58,8 +57,6 @@ export class MurderComponent implements OnInit {
       .attr('height', this.height)
       .attr('fill', 'magenta')
     ;
-
-
 
     const link = context.append('g')
       .attr('class', 'link')

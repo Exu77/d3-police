@@ -4,11 +4,13 @@ import { NgModule } from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { MurderComponent } from './components/murder/murder.component';
+import { MurderStructComponent } from './components/murder-struct/murder-struct.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    MurderComponent
+    MurderComponent,
+    MurderStructComponent
   ],
   imports: [
     BrowserModule,
