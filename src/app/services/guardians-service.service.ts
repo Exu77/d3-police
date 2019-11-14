@@ -11,7 +11,6 @@ export class GuardiansServiceService {
   private catRaceValues: string[] = [];
   private allLinks: ILink[] = [];
 
-
   private allNodes: INode[] = [];
 
   constructor() {
@@ -24,7 +23,7 @@ export class GuardiansServiceService {
     const raceSet: Set<string> = new Set();
     allData.forEach(aMurder => {
       idx += 1;
-      if (idx > 200) return; 
+      if (idx > 200) return;
       aMurder.id = String(aMurder.uid);
 
       genderSet.add(aMurder.gender);
@@ -34,66 +33,65 @@ export class GuardiansServiceService {
       this.mainData.push(aMurder);
 
       this.allNodes.push({
-        id: String(aMurder.uid), 
+        id: String(aMurder.uid),
         name: aMurder.name,
         color: this.getRaceColor(aMurder.race),
-        type: 'murder'});
+        svgId: this.getSvgId(aMurder.armed, aMurder.race, aMurder.gender),
+        type: 'murder'
+      });
 
-      this.allLinks.push(
-        {
-          source: aMurder.id,
-          target: 'race.' + aMurder.race,
-          value: 5,
-        }
-      );
+      this.allLinks.push({
+        source: aMurder.id,
+        target: 'race.' + aMurder.race,
+        value: 5
+      });
 
-      this.allLinks.push(
-        {
-          source: aMurder.id,
-          target: 'armed.' + aMurder.armed,
-          value: 5,
-        }
-      );
+      this.allLinks.push({
+        source: aMurder.id,
+        target: 'armed.' + aMurder.armed,
+        value: 5
+      });
 
-      this.allLinks.push(
-        {
-          source: aMurder.id,
-          target: 'gender.' + aMurder.gender,
-          value: 5,
-        }
-      );
+      this.allLinks.push({
+        source: aMurder.id,
+        target: 'gender.' + aMurder.gender,
+        value: 5
+      });
     });
 
     this.catGenderValues = [...genderSet];
     this.catArmedValues = [...armedSet];
     this.catRaceValues = [...raceSet];
 
-    this.catArmedValues.forEach((val) => {
+    this.catArmedValues.forEach(val => {
       this.allNodes.push({
         id: 'armed.' + val,
         name: val,
         color: 'magenta',
-        type: 'armed'});
+        type: 'armed'
+      });
     });
 
-    this.catRaceValues.forEach((val) => {
+    this.catRaceValues.forEach(val => {
       this.allNodes.push({
         id: 'race.' + val,
         name: val,
         color: 'cyan',
-        type: 'race'});
+        type: 'race'
+      });
     });
 
-    this.catGenderValues.forEach((val) => {
+    this.catGenderValues.forEach(val => {
       this.allNodes.push({
         id: 'gender.' + val,
         name: val,
         color: 'brown',
-        type: 'gender'});
+        type: 'gender'
+      });
     });
   }
 
-  public getLinks(): ILink[]{
+  public getLinks(): ILink[] {
     return this.allLinks;
   }
 
@@ -118,5 +116,20 @@ export class GuardiansServiceService {
     }
 
     return color;
+  }
+
+  private getSvgId(armed, race, gender): string {
+    if (armed === 'Knife') {
+      return '#knife';
+    }
+    if (armed === 'Non-lethal firearm') {
+      console.log('hini');
+      return '#waterpistol';
+    }
+    if (armed === 'Firearm') {
+      return '#pistol';
+    }
+
+    return '';
   }
 }
