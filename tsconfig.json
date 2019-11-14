@@ -19,6 +19,9 @@
       "dom"
     ]
   },
+  "files": [
+    "src/app/typings/global.d.ts"
+  ],
   "angularCompilerOptions": {
     "fullTemplateTypeCheck": true,
     "strictInjectionParameters": true
