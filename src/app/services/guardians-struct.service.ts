@@ -22,9 +22,7 @@ export class GuardiansStructService {
   private mainCatNodes: INode[];
   private mainCatLinks: ILink[];
 
-
-
-  constructor() { 
+  constructor() {
     this.allData = data.default as IMurderCaseGuardian[];
     this.mainData = [];
     this.raceLinks = [];
@@ -34,17 +32,20 @@ export class GuardiansStructService {
     this.genderLinks = [];
     this.genderNodes = [];
     this.mainNodes = [];
-    this.mainCatNodes = [{
+    this.mainCatNodes = [
+      {
         id: 'gender',
         name: 'gender',
         color: null,
         type: 'invisible'
-      }, {
+      },
+      {
         id: 'race',
         name: 'race',
         color: null,
         type: 'invisible'
-      }, {
+      },
+      {
         id: 'armed',
         name: 'armed',
         color: null,
@@ -56,10 +57,10 @@ export class GuardiansStructService {
     const genderSet: Set<string> = new Set();
     const armedSet: Set<string> = new Set();
     const raceSet: Set<string> = new Set();
-    
+
     this.allData.forEach(aMurder => {
       idx += 1;
-     // if (idx > 100) return; 
+      // if (idx > 100) return;
       aMurder.id = String(aMurder.uid);
 
       genderSet.add(aMurder.gender);
@@ -69,41 +70,36 @@ export class GuardiansStructService {
       this.mainData.push(aMurder);
 
       this.mainNodes.push({
-        id: String(aMurder.uid), 
+        id: String(aMurder.uid),
         name: aMurder.name,
         color: this.getRaceColor(aMurder.race),
-        type: 'murder'});
+        type: 'murder'
+      });
 
-      this.raceLinks.push(
-        {
-          source: aMurder.id,
-          target: 'race.' + aMurder.race,
-          value: 1,
-        }
-      );
+      this.raceLinks.push({
+        source: aMurder.id,
+        target: 'race.' + aMurder.race,
+        value: 1
+      });
 
-      this.armedLinks.push(
-        {
-          source: aMurder.id,
-          target: 'armed.' + aMurder.armed,
-          value: 1,
-        }
-      );
+      this.armedLinks.push({
+        source: aMurder.id,
+        target: 'armed.' + aMurder.armed,
+        value: 1
+      });
 
-      this.genderLinks.push(
-        {
-          source: aMurder.id,
-          target: 'gender.' + aMurder.gender,
-          value: 1,
-        }
-      );
+      this.genderLinks.push({
+        source: aMurder.id,
+        target: 'gender.' + aMurder.gender,
+        value: 1
+      });
     });
 
     this.genderValues = [...genderSet];
     this.armedValues = [...armedSet];
     this.raceValues = [...raceSet];
 
-    this.armedValues.forEach((val) => {
+    this.armedValues.forEach(val => {
       const armedKey = 'armed.' + val;
       this.armedNodes.push({
         id: armedKey,
@@ -114,33 +110,35 @@ export class GuardiansStructService {
       this.mainCatLinks.push({
         source: armedKey,
         target: 'armed',
-        value: 1,
+        value: 1
       });
     });
 
-    console.log('race', this.raceValues)
-    this.raceValues.forEach((val) => {
-      const raceKey =  'race.' + val;
+    console.log('race', this.raceValues);
+    this.raceValues.forEach(val => {
+      const raceKey = 'race.' + val;
       this.raceNodes.push({
         id: raceKey,
         name: val,
         color: 'cyan',
-        type: 'race'});
+        type: 'race'
+      });
       this.mainCatLinks.push({
-          source: raceKey,
-          target: 'race',
-          value: 1,
-        });
+        source: raceKey,
+        target: 'race',
+        value: 1
+      });
     });
 
-    this.genderValues.forEach((val) => {
+    this.genderValues.forEach(val => {
       const genderKey = 'gender.' + val;
       this.genderNodes.push({
         id: genderKey,
         name: val,
         color: 'brown',
-        type: 'gender'});
-        /*
+        type: 'gender'
+      });
+      /*
       this.mainCatLinks.push({
           source: genderKey,
           target: 'gender',
@@ -152,7 +150,7 @@ export class GuardiansStructService {
 
   public getMurderNodes(): INode[] {
     return this.mainNodes;
-  }   
+  }
 
   public getArmedNodes(): INode[] {
     return this.armedNodes;
@@ -192,7 +190,7 @@ export class GuardiansStructService {
       color = 'red';
     } else if (race === 'O') {
       color = 'gray';
-    }  else {
+    } else {
       color = 'magenta';
     }
 

@@ -33,5 +33,5 @@ export interface INode {
   name: string;
   color: string;
   type: string;
-  svgId: string;
+  svgId?: string;
 }
