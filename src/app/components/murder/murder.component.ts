@@ -101,29 +101,10 @@ export class MurderComponent implements OnInit {
       .data(allNodes, d => d.id)
       .enter()
       .append('g');
-
-    node
-      .append('use')
-      .attr('xlink:href', d => d.svgId)
-      .attr('fill', d => d.color)
-      .call(
-        d3
-          .drag()
-          .on('start', d => this.dragstarted(d, this.simulation))
-          .on('drag', d => this.dragged(d, this.simulation))
-          .on('end', d => this.dragended(d, this.simulation))
-      );
-
-    node
-      .append('text')
-      .attr('x', '0')
-      .attr('y', '0.5em')
-      .text(d => d.name)
-      .attr('font-family', 'sans-serif')
-      .attr('font-size', '12px')
-      // text-anchor="middle"
-      .attr('text-anchor', 'middle')
-      .attr('fill', 'black');
+    this.createNodeUse(node);
+    this.createNodeCall(node);
+    this.createNodeLabel(node);
+    this.createNodeCall(node);
 
     const xxx = context.selectAll('svg .node circle');
     this.simulation.nodes(allNodes).on('tick', bla => {
@@ -135,6 +116,35 @@ export class MurderComponent implements OnInit {
     node.append('title').text(function(d: IMurderCaseGuardian) {
       return d.name;
     });
+  }
+
+  private createNodeLabel(node) {
+    node
+      .append('text')
+      .attr('x', '0')
+      .attr('y', '0.5em')
+      .text(d => d.name)
+      .attr('font-family', 'sans-serif')
+      .attr('font-size', '12px')
+      .attr('text-anchor', 'middle')
+      .attr('fill', 'black');
+  }
+
+  private createNodeUse(node) {
+    node
+      .append('use')
+      .attr('xlink:href', d => d.svgId)
+      .attr('fill', d => d.color);
+  }
+
+  private createNodeCall(node) {
+    node.call(
+      d3
+        .drag()
+        .on('start', d => this.dragstarted(d, this.simulation))
+        .on('drag', d => this.dragged(d, this.simulation))
+        .on('end', d => this.dragended(d, this.simulation))
+    );
   }
 
   private updateNodes(context: any, allNodes: INode[]) {
