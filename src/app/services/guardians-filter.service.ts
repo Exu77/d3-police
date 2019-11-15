@@ -19,12 +19,33 @@ export class GuardiansFilterService {
 
   constructor() {
     this.allData = data.default as IMurderCaseGuardian[];
+  }
 
+  public load(max: number) {
+    this.getData(max);
+  }
+
+
+  public getNodes(): INode[] {
+    this.filteredNodes = [...this.allNodes];
+    return this.filteredNodes;
+  }
+
+  public getLinks(): ILink[] {
+    this.filterdLinks = [...this.allLinks];
+    return this.filterdLinks;
+  }
+
+  private getData(maxCnt: number) {
+    this.allNodes = [];
+    this.allLinks = [];
     const genderSet: Set<string> = new Set();
     const armedSet: Set<string> = new Set();
     const raceSet: Set<string> = new Set();
-
+    let idx = 0;
     this.allData.forEach(aMurder => {
+      idx += 1;
+      if (maxCnt && idx > maxCnt) return;
       genderSet.add(aMurder.gender);
       armedSet.add(aMurder.armed);
       raceSet.add(aMurder.race);
@@ -103,16 +124,6 @@ export class GuardiansFilterService {
         type: this.typeGender
       });
     });
-  }
-
-  public getNodes(): INode[] {
-    this.filteredNodes = [...this.allNodes];
-    return this.filteredNodes;
-  }
-
-  public getLinks(): ILink[] {
-    this.filterdLinks = [...this.allLinks];
-    return this.filterdLinks;
   }
 
   private getRaceColor(race: string): string {

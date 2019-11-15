@@ -12,6 +12,7 @@ import { SimulationNodeDatum } from 'd3';
 import { GuardiansFilterService } from '../../services/guardians-filter.service';
 import { ILink } from '../../services/models';
 import { SvgDefsService } from '../../services/svg-defs.service';
+import { throwError } from 'rxjs';
 
 @Component({
   selector: 'app-murder',
@@ -45,10 +46,11 @@ export class MurderComponent implements OnInit {
           return d.id;
         })
       )
-      .force('charge', d3.forceManyBody())
+      .force('charge', d3.forceManyBody().strength(-10))
       .force('center', d3.forceCenter(this.width / 2, this.height / 2))
-      .force('x', forceX)
-      .force('y', forceY);
+      // .force('x', forceX)
+      // .force('y', forceY)
+      .on('tick', this.ticked);
   }
 
   ngOnInit() {
@@ -60,6 +62,9 @@ export class MurderComponent implements OnInit {
       .append('svg')
       .attr('width', this.width)
       .attr('height', this.height);
+    
+    context.append('g').attr('class', 'links');
+    context.append('g').attr('class', 'nodes');
 
     this.defsService.addDefs(context);
 
@@ -67,113 +72,78 @@ export class MurderComponent implements OnInit {
   }
 
   public allClick() {
+    this.guardiansService.load(null);
     const allNodes = this.guardiansService.getNodes();
     const allLinks = this.guardiansService.getLinks();
     this.drawMurders(allNodes, allLinks);
   }
 
   public lessClick() {
+    this.guardiansService.load(10);
     const allNodes = this.guardiansService.getNodes();
-    const allLinks = [] // this.guardiansService.getLinks();
+    const allLinks = this.guardiansService.getLinks();
     this.drawMurders(allNodes, allLinks);
   }
 
   private drawMurders(allNodes: INode[], allLinks: ILink[]) {
-
-
-    // const myimage = svg.append('image')
-    // .attr('xlink:href', 'http://lorempixel.com/200/200/')
-    // .attr('width', 200)
-    // .attr('height', 200)
-
     const context = d3.select('div.appMurderComp svg');
     console.log(context)
 
-    const link = context
-      .append('g')
-      .attr('class', 'link')
-      .selectAll('line')
-      .data(allLinks)
-      .enter()
-      .append('line')
-      .attr('class', 'armedLink')
-      .attr('fill', 'red')
-      .attr('stroke', 'green')
-      .attr('stroke-width', (d: ILink) => {
-        return Math.sqrt(d.value);
-      });
-
-    
-    const node = context
-      .append('g')
-      .attr('class', 'node murderNode')
-      .selectAll('circle')
-      .data(allNodes, d => d.id)
-      .enter()
-      .append('g')
-      .append('use')
-      .attr('xlink:href', d => d.svgId)
-      .attr('fill', d => d.color)
-      .call(
-        d3
-          .drag()
-          .on('start', d => this.dragstarted(d, this.simulation))
-          .on('drag', d => this.dragged(d, this.simulation))
-          .on('end', d => this.dragended(d, this.simulation))
-      );
-    
-    // this.updateNodes(context, allNodes);
-    // const node = context.selectAll('svg circle.node');
-    this.simulation.nodes(allNodes).on('tick', bla => {
-      return this.ticked(link, node);
-    });
-    // simulation.nodes(nodeArmed).on('tick', () => this.ticked(link, nodeArmed));
+    const link = null;
+    this.updateLinks(context, allLinks);
+    this.updateNodes(context, allNodes);
+    const node = context.selectAll('g.murderNode');
+    console.log('xxx', node._groups);
+    this.simulation.nodes(allNodes);
     this.simulation.force('link').links(allLinks);
+    node.raise();
+    this.simulation.alpha(2).restart();
+    // simulation.nodes(nodeArmed).on('tick', () => this.ticked(link, nodeArmed));
+    // this.simulation.force('link').links(allLinks);
+  }
 
-    node.append('title').text(function(d: IMurderCaseGuardian) {
-      return d.name;
-    });
+  private updateLinks(context: any, allLinks) {
+    const link = context
+      .selectAll('line.link')
+      .data(allLinks, d => {
+        const id = d.source + '.' + d.target;
+        return id;
+      });
+    link
+      .enter()      
+      .append('line')
+      .attr('class', 'link')
+      .attr('stroke', 'gray')
+      .attr('stroke-width', (d: ILink) => {
+        return Math.sqrt(1);
+      });
+    link.exit().remove();
   }
 
   private updateNodes(context: any, allNodes: INode[]) {
     const node = context
-      .append('g')
-      .attr('class', 'node murderNode')
-      .selectAll('circle')
-      .data(allNodes, d => d.id)
+      .selectAll('g.murderNode')
+      .data(allNodes, d => {
+        return d.id;
+      });
+    node
       .enter()
       .append('g')
-      .append('use')
-      .attr('xlink:href', d => d.svgId)
-      .attr('fill', d => d.color)
+      .attr('class', 'murderNode')
       .call(
         d3
           .drag()
           .on('start', d => this.dragstarted(d, this.simulation))
           .on('drag', d => this.dragged(d, this.simulation))
           .on('end', d => this.dragended(d, this.simulation))
-      );
-      /*
-    node.enter().append('circle')
-      .attr('class', 'node')
-      .attr('cx', (d) => d.x)
-      .attr('cy', (d) => d.y)
-      .enter()
-      .append('g')
+      )
       .append('use')
       .attr('xlink:href', d => d.svgId)
       .attr('fill', d => d.color)
-      .call(
-        d3.drag()
-          .on('start', d => this.dragstarted(d, this.simulation))
-          .on('drag', d => this.dragged(d, this.simulation))
-          .on('end', d => this.dragended(d, this.simulation))
-      );
-  */
+      ;
     node.on('mouseover', this.showDetails)
       .on('mouseout', this.hideDetails)
-  
-    //node.exit().remove();
+    node.exit().remove();
   }
   private showDetails(blup) {
     console.log('show', blup)
@@ -205,18 +175,20 @@ export class MurderComponent implements OnInit {
     d.fy = null;
   }
 
-  private ticked(link, node) {
+  private ticked() {
+    const node = d3.selectAll('svg g.murderNode');
+    const link = d3.selectAll('svg line.link');
     link
-      .attr('x1', function(d: any) {
+      .attr('x1', (d: any) => {
         return d.source.x;
       })
-      .attr('y1', function(d: any) {
+      .attr('y1', (d: any) => {
         return d.source.y;
       })
-      .attr('x2', function(d: any) {
+      .attr('x2', (d: any) => {
         return d.target.x;
       })
-      .attr('y2', function(d: any) {
+      .attr('y2', (d: any) => {
         return d.target.y;
       });
 
