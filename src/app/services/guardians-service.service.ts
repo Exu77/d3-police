@@ -34,7 +34,7 @@ export class GuardiansServiceService {
 
       this.allNodes.push({
         id: String(aMurder.uid),
-        name: aMurder.name,
+        name: '',
         color: this.getRaceColor(aMurder.race),
         svgId: '#murderCircle',
         type: 'murder'
@@ -66,17 +66,17 @@ export class GuardiansServiceService {
     this.catArmedValues.forEach(val => {
       this.allNodes.push({
         id: 'armed.' + val,
-        name: val,
+        name: '',
         color: 'magenta',
         svgId: this.getMurderSvgId(val, null),
         type: 'armed'
       });
     });
-    console.log('armd values', this.catArmedValues);
+    console.log('rassen', this.catRaceValues);
     this.catRaceValues.forEach(val => {
       this.allNodes.push({
         id: 'race.' + val,
-        name: val,
+        name: this.getRaceName(val),
         color: 'cyan',
         svgId: '#raceCircle',
         type: 'race'
@@ -86,7 +86,7 @@ export class GuardiansServiceService {
     this.catGenderValues.forEach(val => {
       this.allNodes.push({
         id: 'gender.' + val,
-        name: val,
+        name: '',
         color: 'brown',
         svgId: this.getMurderSvgId(null, val),
         type: 'gender'
@@ -153,6 +153,28 @@ export class GuardiansServiceService {
       return '#questionMark';
     }
 
+    return '';
+  }
+
+  private getRaceName(race: string): string {
+    if (race === 'B') {
+      return 'BLACK';
+    }
+    if (race === 'W') {
+      return 'WHITE';
+    }
+    if (race === 'H') {
+      return 'HISPANIC';
+    }
+    if (race === 'A') {
+      return 'ASIAN';
+    }
+    if (race === 'U') {
+      return 'UNKNOWN';
+    }
+    if (race === 'N') {
+      return 'NATIVE';
+    }
     return '';
   }
 }

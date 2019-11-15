@@ -58,11 +58,6 @@ export class MurderComponent implements OnInit {
 
     console.log('aaa', murderNodes, allNodes);
 
-    // const myimage = svg.append('image')
-    // .attr('xlink:href', 'http://lorempixel.com/200/200/')
-    // .attr('width', 200)
-    // .attr('height', 200)
-
     const context: any = d3
       .select('div.appMurderComp')
       .append('svg')
@@ -90,7 +85,7 @@ export class MurderComponent implements OnInit {
       .append('g')
       .attr('id', 'genderCircle')
       .append('circle')
-      .attr('r', 30);
+      .attr('r', 20);
 
     const raceCircleDef = d3
       .select('svg')
@@ -98,7 +93,7 @@ export class MurderComponent implements OnInit {
       .append('g')
       .attr('id', 'raceCircle')
       .append('circle')
-      .attr('r', 12);
+      .attr('r', 30);
 
     const murderCircleDef = d3
       .select('svg')
@@ -124,7 +119,9 @@ export class MurderComponent implements OnInit {
       .selectAll('circle')
       .data(allNodes, d => d.id)
       .enter()
-      .append('g')
+      .append('g');
+
+    node
       .append('use')
       .attr('xlink:href', d => d.svgId)
       .attr('fill', d => d.color)
@@ -135,6 +132,17 @@ export class MurderComponent implements OnInit {
           .on('drag', d => this.dragged(d, this.simulation))
           .on('end', d => this.dragended(d, this.simulation))
       );
+
+    node
+      .append('text')
+      .attr('x', '0')
+      .attr('y', '0.35em')
+      .text(d => d.name)
+      .attr('font-family', 'sans-serif')
+      .attr('font-size', '12px')
+      // text-anchor="middle"
+      .attr('text-anchor', 'middle')
+      .attr('fill', 'black');
 
     const xxx = context.selectAll('svg .node circle');
     this.simulation.nodes(allNodes).on('tick', bla => {
