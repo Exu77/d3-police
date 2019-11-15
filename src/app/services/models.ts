@@ -23,18 +23,19 @@ export interface IMurderGraph {
 }
 
 export interface ILink {
-    source: string;
-    target: string;
-    value: number;
-    type?: string;
-  }
+  source: string;
+  target: string;
+  value: number;
+  type?: string;
+  border?: string;
+}
 
 export interface INode {
-    id: string;
-    name: string;   
-    color: string;
-    type: string;
-    x?: number;
-    y?: number;
-    svgId?: string;
+  id: string;
+  name: string;
+  color: string;
+  type: string;
+  x?: number;
+  y?: number;
+  svgId?: string;
 }

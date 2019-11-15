@@ -23,7 +23,6 @@ export class GuardiansFilterService {
     const genderSet: Set<string> = new Set();
     const armedSet: Set<string> = new Set();
     const raceSet: Set<string> = new Set();
-
     this.allData.forEach(aMurder => {
       genderSet.add(aMurder.gender);
       armedSet.add(aMurder.armed);
@@ -34,7 +33,8 @@ export class GuardiansFilterService {
         name: '',
         color: this.getRaceColor(aMurder.race),
         svgId: '#murderCircle',
-        type: 'murder'
+        type: 'murder',
+        border: false
       });
       this.allLinks.push({
         source: String(aMurder.uid),
@@ -62,7 +62,6 @@ export class GuardiansFilterService {
     const armedValues = [...armedSet];
     const raceValues = [...raceSet];
 
-    console.log('armedValues:', armedValues);
     armedValues.forEach(val => {
       const armedKey = this.typeArmed + '.' + val;
       this.allNodes.push({
