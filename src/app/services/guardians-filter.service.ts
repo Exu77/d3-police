@@ -27,7 +27,6 @@ export class GuardiansFilterService {
     this.getData(this.allData);
   }
 
-
   public getNodes(): INode[] {
     this.filteredNodes = [...this.allNodes];
     return this.filteredNodes;
@@ -46,58 +45,26 @@ export class GuardiansFilterService {
     const factors: Map<string, number> = new Map();
     const murderMap: Map<string, IMurderCaseGuardian[]> = new Map();
     for (const aKey of us.keys()) {
-      console.log(aKey, us.get(aKey), actual.get(aKey), actual.get(aKey) - us.get(aKey));
-      factors.set(aKey, actual.get(aKey) - us.get(aKey));
+      const aVal = actual.get(aKey);
+      const uVal = us.get(aKey);
+      const factor = (50 / uVal);
+      const newPerc = actual.get(aKey) + (actual.get(aKey) * factor)
+      console.log(aKey, us.get(aKey), actual.get(aKey), aVal * factor, uVal * factor);
+      factors.set(aKey, aVal * factor / 100);
     }
 
-    this.allData.forEach(aMurder => {
-      allCount += 1;
-      if (!murderMap.has(aMurder.race)) {
-        murderMap.set(aMurder.race, [])
-      }
-      murderMap.get(aMurder.race).push(aMurder);
-    });
-
     const resultData: IMurderCaseGuardian[] = [];
-    for (const aKey of murderMap.keys()) {
+    const noMurders = 500;
+    const uid = 0;
+    for (const aKey of factors.keys()) {
       
-      const cnt = murderMap.get(aKey).length;
-      const factor = factors.get(aKey);
-      const correction = Math.floor((cnt + (allCount * factor / 100)) - cnt);
-      console.log('correct ', aKey, correction)
-      console.log('before', murderMap.get(aKey).length, murderMap.get(aKey));
-      if (correction) {
-        if (correction > 0) {
-          for (let i = 0; i < correction; i++) {
-            const aMurder = murderMap.get(aKey)[i];
-            murderMap.get(aKey).push({
-              age: aMurder.age,
-              armed: aMurder.armed,
-              city: aMurder.city,
-              classification: aMurder.classification,
-              date: aMurder.date,
-              gender: aMurder.gender,
-              hasimage: aMurder.hasimage,
-              large: aMurder.large,
-              lat: aMurder.lat,
-              long: aMurder.long,
-              name: aMurder.name,
-              race: aMurder.race,
-              slug: aMurder.slug,
-              state: aMurder.state,
-              uid: 'murderClone.' + i,
-            });
-          }
-        } else {
-          murderMap.get(aKey).splice(0, Math.abs(correction), null);
-        }
-      }
-      console.log('after', murderMap.get(aKey).length)
-      if (murderMap.get(aKey) && murderMap.get(aKey).length > 0) {
-        murderMap.get(aKey).forEach(aMurder => {
-          if (aMurder) {
-            resultData.push(aMurder);
-          }
+      const cnt = noMurders * factors.get(aKey);
+      for (let i = 0; i < cnt; i++) {
+        uid += 1;
+        resultData.push({
+          race: aKey,
+          uid: 'murderClone.' + uid,
+          armed: 'NO',
         });
       }
     }
@@ -115,12 +82,6 @@ export class GuardiansFilterService {
     const classifSet: Set<string> = new Set();
     let idx = 0;
     posList.forEach((aMurder: IMurderCaseGuardian) => {
-      genderSet.add(aMurder.gender);
-      armedSet.add(aMurder.armed);
-      raceSet.add(aMurder.race);
-      classifSet.add(aMurder.classification);
-      ageSet.add(this.getAgeGroup(aMurder.age));
-
       this.allNodes.push({
         id: String(aMurder.uid),
         name: '',
@@ -128,40 +89,56 @@ export class GuardiansFilterService {
         svgId: '#murderCircle',
         type: 'murder'
       });
-      this.allLinks.push({
-        source: String(aMurder.uid),
-        target: this.typeRace + '.' + aMurder.race,
-        value: 1,
-        type: this.typeRace
-      });
+      
+      if (aMurder.race) {
+        raceSet.add(aMurder.race);
+        this.allLinks.push({
+          source: String(aMurder.uid),
+          target: this.typeRace + '.' + aMurder.race,
+          value: 1,
+          type: this.typeRace
+        });
+      }
 
-      this.allLinks.push({
-        source: String(aMurder.uid),
-        target: this.typeArmed + '.' + aMurder.armed,
-        type: this.typeArmed,
-        value: 1
-      });
+      if (aMurder.armed) {
+        armedSet.add(aMurder.armed);
+        this.allLinks.push({
+          source: String(aMurder.uid),
+          target: this.typeArmed + '.' + aMurder.armed,
+          type: this.typeArmed,
+          value: 1
+        });
+      }
 
-      this.allLinks.push({
-        source: String(aMurder.uid),
-        target: this.typeGender + '.' + aMurder.gender,
-        type: this.typeGender,
-        value: 1
-      });
+      if (aMurder.gender) {
+        genderSet.add(aMurder.gender);
+        this.allLinks.push({
+          source: String(aMurder.uid),
+          target: this.typeGender + '.' + aMurder.gender,
+          type: this.typeGender,
+          value: 1
+        });
+      }
 
-      this.allLinks.push({
-        source: String(aMurder.uid),
-        target: this.typeClassif + '.' + aMurder.classification,
-        type: this.typeClassif,
-        value: 1
-      });
+      if (aMurder.classification) {
+        classifSet.add(aMurder.classification);
+        this.allLinks.push({
+          source: String(aMurder.uid),
+          target: this.typeClassif + '.' + aMurder.classification,
+          type: this.typeClassif,
+          value: 1
+        });
+      }
 
-      this.allLinks.push({
-        source: String(aMurder.uid),
-        target: this.typeAge + '.' + this.getAgeGroup(aMurder.age),
-        type: this.typeAge,
-        value: 1
-      });
+      if (aMurder.age) {
+        ageSet.add(this.getAgeGroup(aMurder.age));
+        this.allLinks.push({
+          source: String(aMurder.uid),
+          target: this.typeAge + '.' + this.getAgeGroup(aMurder.age),
+          type: this.typeAge,
+          value: 1
+        });
+      }
     });
 
     const genderValues = [...genderSet];
@@ -190,7 +167,7 @@ export class GuardiansFilterService {
         name: this.getRaceName(val),
         x: 100,
         y: 100,
-        color: this.getRaceColor(val),
+        color: 'orange',
         svgId: '#raceCircle',
         type: this.typeRace
       });

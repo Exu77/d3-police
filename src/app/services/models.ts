@@ -1,18 +1,18 @@
 export interface IMurderCaseGuardian {
-  age: number;
-  armed: string;
-  city: string;
-  classification: string;
-  date: string;
-  gender: string;
-  hasimage: boolean;
-  large: boolean;
-  lat: number;
-  long: number;
-  name: string;
+  age?: number;
+  armed?: string;
+  city?: string;
+  classification?: string;
+  date?: string;
+  gender?: string;
+  hasimage?: boolean;
+  large?: boolean;
+  lat?: number;
+  long?: number;
+  name?: string;
   race: string;
-  slug: string;
-  state: string;
+  slug?: string;
+  state?: string;
   uid: string;
 }
 
@@ -22,18 +22,18 @@ export interface IMurderGraph {
 }
 
 export interface ILink {
-    source: string;
-    target: string;
-    value: number;
-    type?: string;
-  }
+  source: string;
+  target: string;
+  value: number;
+  type?: string;
+}
 
 export interface INode {
-    id: string;
-    name: string;   
-    color: string;
-    type: string;
-    x?: number;
-    y?: number;
-    svgId?: string;
+  id: string;
+  name: string;
+  color: string;
+  type: string;
+  x?: number;
+  y?: number;
+  svgId?: string;
 }

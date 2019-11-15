@@ -12,6 +12,7 @@ import { SimulationNodeDatum } from 'd3';
 import { GuardiansFilterService } from '../../services/guardians-filter.service';
 import { SvgDefsService } from '../../services/svg-defs.service';
 import { throwError } from 'rxjs';
+import { isContext } from 'vm';
 
 @Component({
   selector: 'app-murder',
@@ -23,9 +24,10 @@ export class MurderComponent implements OnInit {
   public dataPost: any;
   public dataGuard: any;
   public murderNodes: any[];
-  public width = 600;
-  public height = 600;
+  public width = 1000;
+  public height = 1000;
   public zoomContext: any;
+  public force = 30;
 
   // https://www.theguardian.com/us-news/ng-interactive/2015/jun/01/the-counted-police-killings-us-database
   // https://data.census.gov/cedsci/table?q=race&hidePreview=false&table=C02003&tid=ACSDT1Y2018.C02003&lastDisplayedRow=18
@@ -46,8 +48,8 @@ export class MurderComponent implements OnInit {
           return d.id;
         })
       )
-      .force('charge', d3.forceManyBody().strength(-20))
-      .force('center', d3.forceCenter(this.width / 2, this.height / 2))
+      //.force('center', d3.forceCenter(this.width / 2, this.height / 2))
+      // .force('charge', d3.forceManyBody().strength(-5))
       // .force('x', forceX)
       // .force('y', forceY)
       .on('tick', this.ticked);
@@ -63,6 +65,7 @@ export class MurderComponent implements OnInit {
       .append('svg')
       .attr('width', this.width)
       .attr('height', this.height)
+      .attr('viewBox', '-100, -100, 1200, 1200')
       .append('g')
       .attr('class', 'zoomCtx');
     
@@ -76,6 +79,7 @@ export class MurderComponent implements OnInit {
   }
 
   public allClick() {
+    this.force = -20;
     this.guardiansService.load();
     const allNodes = this.guardiansService.getNodes();
     const allLinks = this.guardiansService.getLinks();
@@ -83,6 +87,7 @@ export class MurderComponent implements OnInit {
   }
 
   public lessClick() {
+    this.force = -10;
     this.guardiansService.loadRaceNormalized();
     const allNodes = this.guardiansService.getNodes();
     const allLinks = this.guardiansService.getLinks();
@@ -99,26 +104,27 @@ export class MurderComponent implements OnInit {
     this.simulation.nodes(allNodes);
     this.simulation.force('link').links(allLinks);
     node.raise();
-    this.simulation.alpha(2).restart();
+    this.simulation
+      .force('center', d3.forceCenter(this.width / 2, this.height / 2))
+      .force('charge', d3.forceManyBody().strength(this.force))
+    .alpha(2).restart();
     // simulation.nodes(nodeArmed).on('tick', () => this.ticked(link, nodeArmed));
     // this.simulation.force('link').links(allLinks);
   }
 
   private updateLinks(context: any, allLinks) {
-    const link = context
-      .selectAll('line.link')
-      .data(allLinks, d => {
-        const id = d.source + '.' + d.target;
-        return id;
-      });
+    const link = context.selectAll('line.link').data(allLinks, d => {
+      const id = d.source + '.' + d.target;
+      return id;
+    });
     link
-      .enter()      
+      .enter()
       .append('line')
+      .attr('id', d => d.target)
       .attr('class', 'link')
-      .attr('stroke', 'gray')
-      .attr('stroke-width', (d: ILink) => {
-        return Math.sqrt(1);
-      });
+      .attr('fill', 'red')
+      .attr('stroke', 'grey')
+      .attr('stroke-width', '0.1');
     link.exit().remove();
   }
 
@@ -156,36 +162,49 @@ export class MurderComponent implements OnInit {
   }
 
   private updateNodes(context: any, allNodes: INode[]) {
-    const node = context
-      .selectAll('g.murderNode')
-      .data(allNodes, d => {
-        return d.id;
-      });
+    const node = context.selectAll('g.murderNode').data(allNodes, d => {
+      return d.id;
+    });
     node
       .enter()
       .append('g')
       .attr('class', 'murderNode')
       .append('use')
       .attr('xlink:href', d => d.svgId)
-      .attr('fill', d => d.color)
-    ;
+      .attr('fill', d => d.color);
 
     const d3Nodes = context.selectAll('g.murderNode');
     this.createNodeUse(d3Nodes);
     this.createNodeCall(d3Nodes);
     this.createNodeLabel(d3Nodes);
     this.createNodeCall(d3Nodes);
-      
-    node.on('mouseover', this.showDetails)
-      .on('mouseout', this.hideDetails)
+
     node.exit().remove();
-  }
-  private showDetails(blup) {
-    //g('show', blup);
+    d3.selectAll('g.murderNode')
+      .on('mouseover', d => this.showDetails(context, d))
+      .on('mouseout', d => this.hideDetails(context, d));
   }
 
-  private hideDetails(blup) {
-    //console.log('show', blup)
+  private showDetails(context, d) {
+    const allLines = context.selectAll(`line.link`).nodes();
+    allLines.map(n => {
+      const elem = n as SVGLineElement;
+      if (n.id === d.id) {
+        elem.setAttribute('stroke', 'black');
+        elem.setAttribute('stroke-width', '0.8');
+      }
+    });
+  }
+
+  private hideDetails(context, d) {
+    const allLines = context.selectAll(`line.link`).nodes();
+    allLines.map(n => {
+      const elem = n as SVGLineElement;
+      if (n.id === d.id) {
+        elem.setAttribute('stroke', 'grey');
+        elem.setAttribute('stroke-width', '0.1');
+      }
+    });
   }
 
   private dragstarted(d: any, simulation: any) {
