@@ -51,49 +51,44 @@ export class GuardiansFilterService {
       raceSet.add(aMurder.race);
 
       this.allNodes.push({
-        id: String(aMurder.uid), 
-        name: aMurder.name,
+        id: String(aMurder.uid),
+        name: '',
         color: this.getRaceColor(aMurder.race),
         svgId: '#murderCircle',
         type: 'murder'
       });
-      this.allLinks.push(
-        {
-          source: String(aMurder.uid),
-          target: this.typeRace + '.' + aMurder.race,
-          value: 1,
-          type: this.typeRace
-        }
-      );
+      this.allLinks.push({
+        source: String(aMurder.uid),
+        target: this.typeRace + '.' + aMurder.race,
+        value: 1,
+        type: this.typeRace
+      });
 
-      this.allLinks.push(
-        {
-          source: String(aMurder.uid),
-          target: this.typeArmed + '.' + aMurder.armed,
-          type: this.typeArmed,
-          value: 1,
-        }
-      );
+      this.allLinks.push({
+        source: String(aMurder.uid),
+        target: this.typeArmed + '.' + aMurder.armed,
+        type: this.typeArmed,
+        value: 1
+      });
 
-      this.allLinks.push(
-        {
-          source: String(aMurder.uid),
-          target: this.typeGender + '.' + aMurder.gender,
-          type: this.typeGender,
-          value: 1,
-        }
-      );
+      this.allLinks.push({
+        source: String(aMurder.uid),
+        target: this.typeGender + '.' + aMurder.gender,
+        type: this.typeGender,
+        value: 1
+      });
     });
 
     const genderValues = [...genderSet];
     const armedValues = [...armedSet];
     const raceValues = [...raceSet];
 
-    armedValues.forEach((val) => {
+    console.log('armedValues:', armedValues);
+    armedValues.forEach(val => {
       const armedKey = this.typeArmed + '.' + val;
       this.allNodes.push({
         id: armedKey,
-        name: val,
+        name: '',
         x: 900,
         y: 900,
         color: 'magenta',
@@ -101,24 +96,25 @@ export class GuardiansFilterService {
         type: this.typeArmed
       });
     });
-
-    raceValues.forEach((val) => {
-      const raceKey =  this.typeRace + '.' + val;
+    console.log('raceValues', raceValues);
+    raceValues.forEach(val => {
+      const raceKey = this.typeRace + '.' + val;
       this.allNodes.push({
         id: raceKey,
-        name: val,
+        name: this.getRaceName(val),
         x: 100,
         y: 100,
-        color: 'cyan',
+        color: this.getRaceColor(val),
         svgId: '#raceCircle',
-        type: this.typeRace});
+        type: this.typeRace
+      });
     });
 
-    genderValues.forEach((val) => {
+    genderValues.forEach(val => {
       const genderKey = this.typeGender + '.' + val;
       this.allNodes.push({
         id: genderKey,
-        name: val,
+        name: '',
         color: 'brown',
         svgId: this.getGenderSvgId(val),
         type: this.typeGender
@@ -140,7 +136,9 @@ export class GuardiansFilterService {
       color = 'red';
     } else if (race === 'O') {
       color = 'gray';
-    }  else {
+    } else if (race === 'U') {
+      color = 'orange';
+    } else {
       color = 'magenta';
     }
 
@@ -175,6 +173,9 @@ export class GuardiansFilterService {
     if (armed === 'No') {
       return '#fist';
     }
+    if (armed === 'Disputed') {
+      return '#hammer';
+    }
     if (armed === 'Other') {
       return '#magicWand';
     }
@@ -183,5 +184,29 @@ export class GuardiansFilterService {
     }
 
     return '';
+  }
+  private getRaceName(race: string): string {
+    if (race === 'B') {
+      return 'BLACK';
+    }
+    if (race === 'W') {
+      return 'WHITE';
+    }
+    if (race === 'H') {
+      return 'HISPANIC';
+    }
+    if (race === 'A') {
+      return 'ASIAN';
+    }
+    if (race === 'U') {
+      return 'UNKNOWN';
+    }
+    if (race === 'N') {
+      return 'NATIVE';
+    }
+    if (race === 'O') {
+      return 'OTHER';
+    }
+    return race;
   }
 }

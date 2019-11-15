@@ -14,21 +14,22 @@ export class MurderFilterComponent implements OnInit {
   public height = 1000;
   public simulation: Simulation<SimulationNodeDatum, SimulationLinkDatum>;
 
-  constructor(
-    private service: GuardiansFilterService,
-  ) {
-    this.simulation = d3.forceSimulation()
-      .force('link', d3.forceLink().id((d: any) => {
-        return d.id;
-      }))
+  constructor(private service: GuardiansFilterService) {
+    this.simulation = d3
+      .forceSimulation()
+      .force(
+        'link',
+        d3.forceLink().id((d: any) => {
+          return d.id;
+        })
+      )
       .force('center', d3.forceCenter(this.width / 2, this.height / 2))
       //.force('x', d3.forceX().x(d => d.x).strength(0.03))
       //.force('y', d3.forceY().y(d => d.y).strength(0.03))
-      .force('charge', d3.forceManyBody().strength(-20))
-      //.force("collide",d3.forceCollide().radius(d => d.r * 550))
-      //.force('x', forceX)
-      //.force('y',  forceY)
-    ;
+      .force('charge', d3.forceManyBody().strength(-20));
+    //.force("collide",d3.forceCollide().radius(d => d.r * 550))
+    //.force('x', forceX)
+    //.force('y',  forceY)
   }
 
   ngOnInit() {
@@ -36,33 +37,35 @@ export class MurderFilterComponent implements OnInit {
   }
 
   public draw(nodes: INode[], links: ILink[]) {
-
-    const context: any = d3.select('div.appMurderComp')
+    const context: any = d3
+      .select('div.appMurderComp')
       .append('svg')
       .attr('width', this.width)
       .attr('height', this.height)
-      .attr('fill', 'magenta')
-    ;
+      .attr('fill', 'magenta');
 
-    const d3Links = context.append('g')
-    .attr('class', 'links')
-    .selectAll('line')
-    .data(links)
-    .enter().append('line')
-    .attr('class', 'raceLink')
-    .attr('fill', 'red')
-    .attr('stroke', 'gray')
-    .attr('stroke-width', (d: ILink) => {
-      return Math.sqrt(1);
-    });
+    const d3Links = context
+      .append('g')
+      .attr('class', 'links')
+      .selectAll('line')
+      .data(links)
+      .enter()
+      .append('line')
+      .attr('class', 'raceLink')
+      .attr('fill', 'red')
+      .attr('stroke', 'gray')
+      .attr('stroke-width', (d: ILink) => {
+        return Math.sqrt(1);
+      });
 
-    const d3Nodes = context.append('g')
+    const d3Nodes = context
+      .append('g')
       .attr('class', 'nodes')
       .selectAll('circle')
-      .data(nodes, (d) => d.id)
+      .data(nodes, d => d.id)
       .enter()
       .append('circle')
-      .attr('r', (d) => {
+      .attr('r', d => {
         if (d.type === 'murder') {
           return 3;
         }
@@ -71,18 +74,20 @@ export class MurderFilterComponent implements OnInit {
       .attr('fill', function(d) {
         return d.color;
       })
-      .call(d3.drag()
-          .on('start', (d) => this.dragstarted(d, this.simulation))
-          .on('drag', (d) => this.dragged(d, this.simulation))
-          .on('end', (d) => this.dragended(d, this.simulation))
+      .call(
+        d3
+          .drag()
+          .on('start', d => this.dragstarted(d, this.simulation))
+          .on('drag', d => this.dragged(d, this.simulation))
+          .on('end', d => this.dragended(d, this.simulation))
       );
 
     this.simulation.nodes(nodes);
-    this.simulation.on('tick', this.ticked)
-      // .charge(-200)
-      //.linkDistance(50)
+    this.simulation.on('tick', this.ticked);
+    // .charge(-200)
+    //.linkDistance(50)
     this.simulation.force('link').links(links);
-}
+  }
 
   private dragstarted(d: any, simulation: any) {
     if (!d3.event.active) {
@@ -104,9 +109,9 @@ export class MurderFilterComponent implements OnInit {
     d.fx = null;
     d.fy = null;
   }
-  
+
   private ticked() {
-    console.log('ticked')
+    console.log('ticked');
     const node = d3.selectAll('svg .nodes circle');
     const link = d3.selectAll('svg .links line');
     link
@@ -131,5 +136,4 @@ export class MurderFilterComponent implements OnInit {
         return d.y;
       });
   }
-
 }

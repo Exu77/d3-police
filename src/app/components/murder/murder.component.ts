@@ -33,7 +33,7 @@ export class MurderComponent implements OnInit {
 
   constructor(
     private guardiansService: GuardiansFilterService,
-    private defsService: SvgDefsService,
+    private defsService: SvgDefsService
   ) {
     const forceX = d3.forceX(this.width / 4).strength(0.05);
     const forceY = d3.forceY(this.height / 4).strength(0.05);
@@ -54,8 +54,7 @@ export class MurderComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log('const', d3
-    .select('div.appMurderComp'))
+    console.log('const', d3.select('div.appMurderComp'));
 
     const context: any = d3
       .select('div.appMurderComp')
@@ -87,7 +86,6 @@ export class MurderComponent implements OnInit {
 
   private drawMurders(allNodes: INode[], allLinks: ILink[]) {
     const context = d3.select('div.appMurderComp svg');
-    console.log(context)
 
     const link = null;
     this.updateLinks(context, allLinks);
@@ -120,6 +118,35 @@ export class MurderComponent implements OnInit {
     link.exit().remove();
   }
 
+  private createNodeLabel(node) {
+    node
+      .append('text')
+      .attr('x', '0')
+      .attr('y', '0.5em')
+      .text(d => d.name)
+      .attr('font-family', 'sans-serif')
+      .attr('font-size', '12px')
+      .attr('text-anchor', 'middle')
+      .attr('fill', d => (d.color === 'black' ? 'white' : 'black'));
+  }
+
+  private createNodeUse(node) {
+    node
+      .append('use')
+      .attr('xlink:href', d => d.svgId)
+      .attr('fill', d => d.color);
+  }
+
+  private createNodeCall(node) {
+    node.call(
+      d3
+        .drag()
+        .on('start', d => this.dragstarted(d, this.simulation))
+        .on('drag', d => this.dragged(d, this.simulation))
+        .on('end', d => this.dragended(d, this.simulation))
+    );
+  }
+
   private updateNodes(context: any, allNodes: INode[]) {
     const node = context
       .selectAll('g.murderNode')
@@ -130,23 +157,23 @@ export class MurderComponent implements OnInit {
       .enter()
       .append('g')
       .attr('class', 'murderNode')
-      .call(
-        d3
-          .drag()
-          .on('start', d => this.dragstarted(d, this.simulation))
-          .on('drag', d => this.dragged(d, this.simulation))
-          .on('end', d => this.dragended(d, this.simulation))
-      )
       .append('use')
       .attr('xlink:href', d => d.svgId)
       .attr('fill', d => d.color)
-      ;
+    ;
+
+    const d3Nodes = context.selectAll('g.murderNode');
+    this.createNodeUse(d3Nodes);
+    this.createNodeCall(d3Nodes);
+    this.createNodeLabel(d3Nodes);
+    this.createNodeCall(d3Nodes);
+      
     node.on('mouseover', this.showDetails)
       .on('mouseout', this.hideDetails)
     node.exit().remove();
   }
   private showDetails(blup) {
-    console.log('show', blup)
+    console.log('show', blup);
   }
 
   private hideDetails(blup) {
@@ -168,7 +195,6 @@ export class MurderComponent implements OnInit {
 
   private dragended(d: any, simulation: any) {
     if (!d3.event.active) {
-      console.log('dragended', this.simulation, d);
       this.simulation.alphaTarget(0);
     }
     d.fx = null;

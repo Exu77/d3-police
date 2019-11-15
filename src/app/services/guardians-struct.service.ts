@@ -71,7 +71,7 @@ export class GuardiansStructService {
 
       this.mainNodes.push({
         id: String(aMurder.uid),
-        name: aMurder.name,
+        name: '',
         color: this.getRaceColor(aMurder.race),
         type: 'murder'
       });
@@ -103,7 +103,7 @@ export class GuardiansStructService {
       const armedKey = 'armed.' + val;
       this.armedNodes.push({
         id: armedKey,
-        name: val,
+        name: '',
         x: 900,
         y: 900,
         color: 'magenta',
@@ -121,7 +121,7 @@ export class GuardiansStructService {
       const raceKey = 'race.' + val;
       this.raceNodes.push({
         id: raceKey,
-        name: val,
+        name: this.getRaceName(val),
         x: 100,
         y: 100,
         color: 'cyan',
@@ -138,7 +138,7 @@ export class GuardiansStructService {
       const genderKey = 'gender.' + val;
       this.genderNodes.push({
         id: genderKey,
-        name: val,
+        name: '',
         color: 'brown',
         type: 'gender'
       });
@@ -199,5 +199,30 @@ export class GuardiansStructService {
     }
 
     return color;
+  }
+
+  private getRaceName(race: string): string {
+    if (race === 'B') {
+      return 'BLACK';
+    }
+    if (race === 'W') {
+      return 'WHITE';
+    }
+    if (race === 'H') {
+      return 'HISPANIC';
+    }
+    if (race === 'A') {
+      return 'ASIAN';
+    }
+    if (race === 'U') {
+      return 'UNKNOWN';
+    }
+    if (race === 'N') {
+      return 'NATIVE';
+    }
+    if (race === 'O') {
+      return 'OTHER';
+    }
+    return race;
   }
 }
