@@ -62,6 +62,7 @@ export class GuardiansFilterService {
     const armedValues = [...armedSet];
     const raceValues = [...raceSet];
 
+    console.log('armedValues:', armedValues);
     armedValues.forEach(val => {
       const armedKey = this.typeArmed + '.' + val;
       this.allNodes.push({
@@ -82,7 +83,7 @@ export class GuardiansFilterService {
         name: this.getRaceName(val),
         x: 100,
         y: 100,
-        color: 'cyan',
+        color: this.getRaceColor(val),
         svgId: '#raceCircle',
         type: this.typeRace
       });
@@ -124,6 +125,8 @@ export class GuardiansFilterService {
       color = 'red';
     } else if (race === 'O') {
       color = 'gray';
+    } else if (race === 'U') {
+      color = 'orange';
     } else {
       color = 'magenta';
     }
@@ -158,6 +161,9 @@ export class GuardiansFilterService {
     }
     if (armed === 'No') {
       return '#fist';
+    }
+    if (armed === 'Disputed') {
+      return '#hammer';
     }
     if (armed === 'Other') {
       return '#magicWand';

@@ -127,7 +127,7 @@ export class MurderComponent implements OnInit {
       .attr('font-family', 'sans-serif')
       .attr('font-size', '12px')
       .attr('text-anchor', 'middle')
-      .attr('fill', 'black');
+      .attr('fill', d => (d.color === 'black' ? 'white' : 'black'));
   }
 
   private createNodeUse(node) {
@@ -209,7 +209,6 @@ export class MurderComponent implements OnInit {
 
   private dragended(d: any, simulation: any) {
     if (!d3.event.active) {
-      console.log('dragended', this.simulation, d);
       this.simulation.alphaTarget(0);
     }
     d.fx = null;
