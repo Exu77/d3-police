@@ -13,8 +13,7 @@ export interface IMurderCaseGuardian {
   race: string;
   slug: string;
   state: string;
-  uid: number;
-  id: string;
+  uid: string;
 }
 
 export interface IMurderGraph {

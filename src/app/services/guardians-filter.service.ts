@@ -16,13 +16,15 @@ export class GuardiansFilterService {
   public readonly typeRace = 'race';
   public readonly typeArmed = 'armed';
   public readonly typeGender = 'gender';
+  public readonly typeClassif = 'classif';
+  public readonly typeAge = 'age';
 
   constructor() {
     this.allData = data.default as IMurderCaseGuardian[];
   }
 
-  public load(max: number) {
-    this.getData(max);
+  public load() {
+    this.getData(this.allData);
   }
 
 
@@ -36,19 +38,88 @@ export class GuardiansFilterService {
     return this.filterdLinks;
   }
 
-  private getData(maxCnt: number) {
+  public loadRaceNormalized() {
+    const us = this.getUsRacePerc();
+    const actual = this.getThisRacePerc();
+    let allCount = 0;
+
+    const factors: Map<string, number> = new Map();
+    const murderMap: Map<string, IMurderCaseGuardian[]> = new Map();
+    for (const aKey of us.keys()) {
+      console.log(aKey, us.get(aKey), actual.get(aKey), actual.get(aKey) - us.get(aKey));
+      factors.set(aKey, actual.get(aKey) - us.get(aKey));
+    }
+
+    this.allData.forEach(aMurder => {
+      allCount += 1;
+      if (!murderMap.has(aMurder.race)) {
+        murderMap.set(aMurder.race, [])
+      }
+      murderMap.get(aMurder.race).push(aMurder);
+    });
+
+    const resultData: IMurderCaseGuardian[] = [];
+    for (const aKey of murderMap.keys()) {
+      
+      const cnt = murderMap.get(aKey).length;
+      const factor = factors.get(aKey);
+      const correction = Math.floor((cnt + (allCount * factor / 100)) - cnt);
+      console.log('correct ', aKey, correction)
+      console.log('before', murderMap.get(aKey).length, murderMap.get(aKey));
+      if (correction) {
+        if (correction > 0) {
+          for (let i = 0; i < correction; i++) {
+            const aMurder = murderMap.get(aKey)[i];
+            murderMap.get(aKey).push({
+              age: aMurder.age,
+              armed: aMurder.armed,
+              city: aMurder.city,
+              classification: aMurder.classification,
+              date: aMurder.date,
+              gender: aMurder.gender,
+              hasimage: aMurder.hasimage,
+              large: aMurder.large,
+              lat: aMurder.lat,
+              long: aMurder.long,
+              name: aMurder.name,
+              race: aMurder.race,
+              slug: aMurder.slug,
+              state: aMurder.state,
+              uid: 'murderClone.' + i,
+            });
+          }
+        } else {
+          murderMap.get(aKey).splice(0, Math.abs(correction), null);
+        }
+      }
+      console.log('after', murderMap.get(aKey).length)
+      if (murderMap.get(aKey) && murderMap.get(aKey).length > 0) {
+        murderMap.get(aKey).forEach(aMurder => {
+          if (aMurder) {
+            resultData.push(aMurder);
+          }
+        });
+      }
+    }
+    console.log('consData', resultData)
+    this.getData(resultData);
+  }
+
+  private getData(posList: IMurderCaseGuardian[]) {
     this.allNodes = [];
     this.allLinks = [];
     const genderSet: Set<string> = new Set();
     const armedSet: Set<string> = new Set();
     const raceSet: Set<string> = new Set();
+    const ageSet: Set<string> = new Set();
+    const classifSet: Set<string> = new Set();
     let idx = 0;
-    this.allData.forEach(aMurder => {
-      idx += 1;
-      if (maxCnt && idx > maxCnt) return;
+    posList.forEach((aMurder: IMurderCaseGuardian) => {
       genderSet.add(aMurder.gender);
       armedSet.add(aMurder.armed);
       raceSet.add(aMurder.race);
+      classifSet.add(aMurder.classification);
+      ageSet.add(this.getAgeGroup(aMurder.age));
 
       this.allNodes.push({
         id: String(aMurder.uid),
@@ -77,13 +148,28 @@ export class GuardiansFilterService {
         type: this.typeGender,
         value: 1
       });
+
+      this.allLinks.push({
+        source: String(aMurder.uid),
+        target: this.typeClassif + '.' + aMurder.classification,
+        type: this.typeClassif,
+        value: 1
+      });
+
+      this.allLinks.push({
+        source: String(aMurder.uid),
+        target: this.typeAge + '.' + this.getAgeGroup(aMurder.age),
+        type: this.typeAge,
+        value: 1
+      });
     });
 
     const genderValues = [...genderSet];
     const armedValues = [...armedSet];
     const raceValues = [...raceSet];
+    const classifValues = [...classifSet];
+    const ageValues = [...ageSet];
 
-    console.log('armedValues:', armedValues);
     armedValues.forEach(val => {
       const armedKey = this.typeArmed + '.' + val;
       this.allNodes.push({
@@ -96,7 +182,7 @@ export class GuardiansFilterService {
         type: this.typeArmed
       });
     });
-    console.log('raceValues', raceValues);
+
     raceValues.forEach(val => {
       const raceKey = this.typeRace + '.' + val;
       this.allNodes.push({
@@ -115,9 +201,31 @@ export class GuardiansFilterService {
       this.allNodes.push({
         id: genderKey,
         name: '',
-        color: 'brown',
+        color: 'blue',
         svgId: this.getGenderSvgId(val),
         type: this.typeGender
+      });
+    });
+
+    classifValues.forEach(val => {
+      const key = this.typeClassif + '.' + val;
+      this.allNodes.push({
+        id: key,
+        name: val,
+        color: 'green',
+        svgId: '#raceCircle',
+        type: this.typeClassif
+      });
+    });
+
+    ageValues.forEach(val => {
+      const key = this.typeAge + '.' + val;
+      this.allNodes.push({
+        id: key,
+        name: val,
+        color: 'cyan',
+        svgId: '#raceCircle',
+        type: this.typeAge
       });
     });
   }
@@ -208,5 +316,61 @@ export class GuardiansFilterService {
       return 'OTHER';
     }
     return race;
+  }
+
+  private getThisRacePerc() {
+    let total = 0;
+    const raceMap: Map<string, number> = new Map();
+    this.allData.forEach(aMurder => {
+      total += 1;
+      if (!raceMap.has(aMurder.race)) {
+        raceMap.set(aMurder.race, 0);
+      }
+      raceMap.set(aMurder.race, (raceMap.get(aMurder.race) + 1));
+    });
+
+    const result: Map<string, number> = new Map();
+    for (const aKey of raceMap.keys()) {
+      result.set(aKey, raceMap.get(aKey) / (total / 100));
+    }
+
+    return result;
+  }
+
+  private getUsRacePerc() {
+    const result: Map<string, number> = new Map();
+    result.set('W', 60.4);
+    result.set('B', 13.4);
+    result.set('N', 1.3);
+    result.set('A', 5.9);
+    result.set('O', 0.7);
+    result.set('H', 18.3);
+    return result;
+/*
+PEOPLE
+Race and Hispanic Origin	
+White alone, percent	76.5%
+Black or African American alone, percent(a)	13.4%
+American Indian and Alaska Native alone, percent(a)	1.3%
+Asian alone, percent(a)	5.9%
+Native Hawaiian and Other Pacific Islander alone, percent(a)	0.2%
+Two or More Races, percent	2.7%
+Hispanic or Latino, percent(b)	18.3%
+White alone, not Hispanic or Latino, percent	60.4%
+*/
+  }
+
+public getAgeGroup(age: number): string {
+    if (age < 16) {
+      return '<16';
+    }  else if (age < 25) {
+      return '<26';
+    } else if (age < 35) {
+      return '<36';
+    } else if (age < 45) {
+      return '<46';
+    }
+
+    return '>45';
   }
 }

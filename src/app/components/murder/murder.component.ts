@@ -10,7 +10,6 @@ import {
 } from '../../services/models';
 import { SimulationNodeDatum } from 'd3';
 import { GuardiansFilterService } from '../../services/guardians-filter.service';
-import { ILink } from '../../services/models';
 import { SvgDefsService } from '../../services/svg-defs.service';
 import { throwError } from 'rxjs';
 
@@ -24,8 +23,9 @@ export class MurderComponent implements OnInit {
   public dataPost: any;
   public dataGuard: any;
   public murderNodes: any[];
-  public width = 1000;
-  public height = 1000;
+  public width = 600;
+  public height = 600;
+  public zoomContext: any;
 
   // https://www.theguardian.com/us-news/ng-interactive/2015/jun/01/the-counted-police-killings-us-database
   // https://data.census.gov/cedsci/table?q=race&hidePreview=false&table=C02003&tid=ACSDT1Y2018.C02003&lastDisplayedRow=18
@@ -46,22 +46,27 @@ export class MurderComponent implements OnInit {
           return d.id;
         })
       )
-      .force('charge', d3.forceManyBody().strength(-10))
+      .force('charge', d3.forceManyBody().strength(-20))
       .force('center', d3.forceCenter(this.width / 2, this.height / 2))
       // .force('x', forceX)
       // .force('y', forceY)
       .on('tick', this.ticked);
+
+    const zoomHandler = d3.zoom()
+      .on("zoom", this.zoom_actions);
+    zoomHandler(d3.select('div.appMurderComp svg'));
   }
 
   ngOnInit() {
-    console.log('const', d3.select('div.appMurderComp'));
-
     const context: any = d3
       .select('div.appMurderComp')
       .append('svg')
       .attr('width', this.width)
-      .attr('height', this.height);
+      .attr('height', this.height)
+      .append('g')
+      .attr('class', 'zoomCtx');
     
+    this.zoomContext = d3.select('svg g.zoomCtx');
     context.append('g').attr('class', 'links');
     context.append('g').attr('class', 'nodes');
 
@@ -71,27 +76,26 @@ export class MurderComponent implements OnInit {
   }
 
   public allClick() {
-    this.guardiansService.load(null);
+    this.guardiansService.load();
     const allNodes = this.guardiansService.getNodes();
     const allLinks = this.guardiansService.getLinks();
     this.drawMurders(allNodes, allLinks);
   }
 
   public lessClick() {
-    this.guardiansService.load(10);
+    this.guardiansService.loadRaceNormalized();
     const allNodes = this.guardiansService.getNodes();
     const allLinks = this.guardiansService.getLinks();
     this.drawMurders(allNodes, allLinks);
   }
 
   private drawMurders(allNodes: INode[], allLinks: ILink[]) {
-    const context = d3.select('div.appMurderComp svg');
+    const context = this.getContext();
 
     const link = null;
     this.updateLinks(context, allLinks);
     this.updateNodes(context, allNodes);
     const node = context.selectAll('g.murderNode');
-    console.log('xxx', node._groups);
     this.simulation.nodes(allNodes);
     this.simulation.force('link').links(allLinks);
     node.raise();
@@ -128,6 +132,10 @@ export class MurderComponent implements OnInit {
       .attr('font-size', '12px')
       .attr('text-anchor', 'middle')
       .attr('fill', d => (d.color === 'black' ? 'white' : 'black'));
+  }
+
+  private getContext() {
+    return d3.select('div.appMurderComp svg g.zoomCtx');
   }
 
   private createNodeUse(node) {
@@ -173,7 +181,7 @@ export class MurderComponent implements OnInit {
     node.exit().remove();
   }
   private showDetails(blup) {
-    console.log('show', blup);
+    //g('show', blup);
   }
 
   private hideDetails(blup) {
@@ -219,5 +227,10 @@ export class MurderComponent implements OnInit {
       });
 
     node.attr('transform', d => `translate(${d.x},${d.y})`);
+  }
+
+  private zoom_actions() {
+    console.log('zooom')
+      this.zoomContext.attr("transform", d3.event.transform);
   }
 }
