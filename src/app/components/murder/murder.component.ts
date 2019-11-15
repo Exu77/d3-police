@@ -224,8 +224,8 @@ export class MurderComponent implements OnInit {
     if (!d3.event.active) {
       this.simulation.alphaTarget(0);
     }
-    d.fx = null;
-    d.fy = null;
+    d.fx = d3.event.x;
+    d.fy = d3.event.y;
   }
 
   private ticked() {
