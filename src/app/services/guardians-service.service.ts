@@ -175,6 +175,9 @@ export class GuardiansServiceService {
     if (race === 'N') {
       return 'NATIVE';
     }
+    if (race === 'O') {
+      return 'OTHER';
+    }
     return '';
   }
 }
