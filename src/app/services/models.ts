@@ -26,6 +26,7 @@ export interface ILink {
     source: string;
     target: string;
     value: number;
+    type?: string;
   }
 
 export interface INode {
@@ -33,4 +34,6 @@ export interface INode {
     name: string;   
     color: string;
     type: string;
+    x?: number;
+    y?: number;
 }

@@ -3,6 +3,7 @@ import { GuardiansStructService } from '../../services/guardians-struct.service'
 import * as d3 from 'd3';
 import { ILink } from '../../services/models';
 import { race } from 'rxjs';
+import { Simulation, SimulationNodeDatum } from 'd3';
 
 @Component({
   selector: 'app-murder-struct',
@@ -11,7 +12,7 @@ import { race } from 'rxjs';
 })
 export class MurderStructComponent implements OnInit {
   public width = 1000;
-  public height = 400;
+  public height = 1000;
 
   constructor(
     private service: GuardiansStructService
@@ -30,17 +31,20 @@ export class MurderStructComponent implements OnInit {
     const mainCatData = this.service.getMainCatNodes();
     const mainCatLinks = this.service.getMainCatLinks();
 
-    const forceX = d3.forceX(this.width / 4).strength(0.05);
-    const forceY = d3.forceY(this.height / 4).strength(0.05);
+    const forceX = d3.forceX(this.width / 4).strength(0.21);
+    const forceY = d3.forceY(this.height / 4).strength(0.21);
 
     const simulation = d3.forceSimulation()
       .force('link', d3.forceLink().id((d: any) => {
         return d.id;
       }))
-      .force('charge', d3.forceManyBody().strength(-10))
       .force('center', d3.forceCenter(this.width / 2, this.height / 2))
- //     .force('x', forceX)
- //     .force('y',  forceY)
+      //.force('x', d3.forceX().x(d => d.x).strength(0.03))
+      //.force('y', d3.forceY().y(d => d.y).strength(0.03))
+      .force('charge', d3.forceManyBody().strength(-20))
+       .force("collide",d3.forceCollide().radius(d => d.r * 550))
+      //.force('x', forceX)
+      //.force('y',  forceY)
     ;
 
     const context: any = d3.select('div.appMurderComp')
@@ -153,9 +157,13 @@ export class MurderStructComponent implements OnInit {
           .on('start', (d) => this.dragstarted(d, simulation))
           .on('drag', (d) => this.dragged(d, simulation))
           .on('end', (d) => this.dragended(d, simulation))
-      );
-    const allNodes = nodes.selectAll('svg .nodes circle');
-    const allLinks = links.selectAll('svg .links line');
+      )
+      .append('text')
+      .attr('x', '50%')
+      .attr('y', '30%')
+      .append('tspan')
+      .text((d) => d.name)
+      ;
     const allData = [...raceData]
       .concat([...murderData])
       .concat([...mainCatData])
@@ -166,10 +174,12 @@ export class MurderStructComponent implements OnInit {
       .concat([...armedLinks]);
     console.log('allData', allData);
 
-    simulation.nodes(allData).on('tick', (bla) => {
-      console.log('ticked', bla);
-      return this.ticked(allLinks, allNodes)
-    });
+    simulation.nodes(allData);
+    simulation.on('tick', this.ticked)
+      // .charge(-200)
+      //.linkDistance(50)
+    simulation.alpha(5).restart();
+;
 
     simulation.force('link').links(allLinkData);
 }
@@ -195,7 +205,10 @@ export class MurderStructComponent implements OnInit {
     d.fy = null;
   }
   
-  private ticked(link, node) {
+  private ticked() {
+    console.log('ticked')
+    const node = d3.selectAll('svg .nodes circle');
+    const link = d3.selectAll('svg .links line');
     link
       .attr('x1', function(d: any) {
         return d.source.x;

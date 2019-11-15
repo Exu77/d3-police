@@ -72,7 +72,9 @@ export class GuardiansServiceService {
       this.allNodes.push({
         id: 'armed.' + val,
         name: val,
-        color: 'magenta',
+        color: 'white',
+        x: 100,
+        y: 100,
         type: 'armed'});
     });
 
@@ -80,6 +82,8 @@ export class GuardiansServiceService {
       this.allNodes.push({
         id: 'race.' + val,
         name: val,
+        x: 900,
+        y: 500,
         color: 'cyan',
         type: 'race'});
     });
@@ -89,6 +93,8 @@ export class GuardiansServiceService {
         id: 'gender.' + val,
         name: val,
         color: 'brown',
+        x: 500,
+        y: 900,
         type: 'gender'});
     });
   }

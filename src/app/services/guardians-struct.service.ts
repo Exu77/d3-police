@@ -59,7 +59,7 @@ export class GuardiansStructService {
     
     this.allData.forEach(aMurder => {
       idx += 1;
-     // if (idx > 100) return; 
+     if (idx > 100) return; 
       aMurder.id = String(aMurder.uid);
 
       genderSet.add(aMurder.gender);
@@ -108,6 +108,8 @@ export class GuardiansStructService {
       this.armedNodes.push({
         id: armedKey,
         name: val,
+        x: 900,
+        y: 900,
         color: 'magenta',
         type: 'armed'
       });
@@ -124,6 +126,8 @@ export class GuardiansStructService {
       this.raceNodes.push({
         id: raceKey,
         name: val,
+        x: 100,
+        y: 100,
         color: 'cyan',
         type: 'race'});
       this.mainCatLinks.push({
