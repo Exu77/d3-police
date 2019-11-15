@@ -33,6 +33,7 @@ export class GuardiansFilterService {
         id: String(aMurder.uid), 
         name: aMurder.name,
         color: this.getRaceColor(aMurder.race),
+        svgId: '#murderCircle',
         type: 'murder'
       });
       this.allLinks.push(
@@ -75,6 +76,7 @@ export class GuardiansFilterService {
         x: 900,
         y: 900,
         color: 'magenta',
+        svgId: this.getArmedSvgId(val),
         type: this.typeArmed
       });
     });
@@ -87,6 +89,7 @@ export class GuardiansFilterService {
         x: 100,
         y: 100,
         color: 'cyan',
+        svgId: '#raceCircle',
         type: this.typeRace});
     });
 
@@ -96,6 +99,7 @@ export class GuardiansFilterService {
         id: genderKey,
         name: val,
         color: 'brown',
+        svgId: this.getGenderSvgId(val),
         type: this.typeGender
       });
     });
@@ -130,5 +134,43 @@ export class GuardiansFilterService {
     }
 
     return color;
+  }
+
+  private getGenderSvgId(gender: string): string {
+    if (gender === 'F') {
+      return '#female';
+    }
+    if (gender === 'M') {
+      return '#male';
+    }
+    if (gender === 'N') {
+      return '#questionMark';
+    }
+  }
+
+  private getArmedSvgId(armed): string {
+    if (armed === 'Knife') {
+      return '#knife';
+    }
+    if (armed === 'Non-lethal firearm') {
+      return '#waterpistol';
+    }
+    if (armed === 'Firearm') {
+      return '#pistol';
+    }
+    if (armed === 'Vehicle') {
+      return '#vehicle';
+    }
+    if (armed === 'No') {
+      return '#fist';
+    }
+    if (armed === 'Other') {
+      return '#magicWand';
+    }
+    if (armed === 'Unknown') {
+      return '#questionMark';
+    }
+
+    return '';
   }
 }
