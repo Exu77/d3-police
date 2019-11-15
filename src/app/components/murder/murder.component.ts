@@ -109,7 +109,7 @@ export class MurderComponent implements OnInit {
       .enter()
       .append('line')
       .attr('id', d => d.source)
-      .attr('class', 'armedLink')
+      .attr('class', 'link')
       .attr('fill', 'red')
       .attr('stroke', 'gray')
       .attr('stroke-width', (d: ILink) => {
