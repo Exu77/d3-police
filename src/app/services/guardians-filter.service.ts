@@ -54,8 +54,7 @@ export class GuardiansFilterService {
         name: '',
         color: this.getRaceColor(aMurder.race),
         svgId: '#murderCircle',
-        type: 'murder',
-        border: false
+        type: 'murder'
       });
       this.allLinks.push({
         source: String(aMurder.uid),

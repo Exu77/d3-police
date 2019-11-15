@@ -27,7 +27,6 @@ export interface ILink {
   target: string;
   value: number;
   type?: string;
-  border?: string;
 }
 
 export interface INode {

@@ -13,6 +13,7 @@ import { GuardiansFilterService } from '../../services/guardians-filter.service'
 import { ILink } from '../../services/models';
 import { SvgDefsService } from '../../services/svg-defs.service';
 import { throwError } from 'rxjs';
+import { isContext } from 'vm';
 
 @Component({
   selector: 'app-murder',
@@ -108,13 +109,11 @@ export class MurderComponent implements OnInit {
     link
       .enter()
       .append('line')
-      .attr('id', d => d.source)
+      .attr('id', d => d.target)
       .attr('class', 'link')
       .attr('fill', 'red')
-      .attr('stroke', 'gray')
-      .attr('stroke-width', (d: ILink) => {
-        return Math.sqrt(1);
-      });
+      .attr('stroke', 'grey')
+      .attr('stroke-width', '0.1');
     link.exit().remove();
   }
 
@@ -165,15 +164,32 @@ export class MurderComponent implements OnInit {
     this.createNodeLabel(d3Nodes);
     this.createNodeCall(d3Nodes);
 
-    node.on('mouseover', this.showDetails).on('mouseout', this.hideDetails);
     node.exit().remove();
-  }
-  private showDetails(blup) {
-    console.log('show', blup);
+    d3.selectAll('g.murderNode')
+      .on('mouseover', d => this.showDetails(context, d))
+      .on('mouseout', d => this.hideDetails(context, d));
   }
 
-  private hideDetails(blup) {
-    //console.log('show', blup)
+  private showDetails(context, d) {
+    const allLines = context.selectAll(`line.link`).nodes();
+    allLines.map(n => {
+      const elem = n as SVGLineElement;
+      if (n.id === d.id) {
+        elem.setAttribute('stroke', 'black');
+        elem.setAttribute('stroke-width', '0.8');
+      }
+    });
+  }
+
+  private hideDetails(context, d) {
+    const allLines = context.selectAll(`line.link`).nodes();
+    allLines.map(n => {
+      const elem = n as SVGLineElement;
+      if (n.id === d.id) {
+        elem.setAttribute('stroke', 'grey');
+        elem.setAttribute('stroke-width', '0.1');
+      }
+    });
   }
 
   private dragstarted(d: any, simulation: any) {
