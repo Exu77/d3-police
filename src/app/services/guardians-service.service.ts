@@ -178,6 +178,6 @@ export class GuardiansServiceService {
     if (race === 'O') {
       return 'OTHER';
     }
-    return '';
+    return race;
   }
 }
